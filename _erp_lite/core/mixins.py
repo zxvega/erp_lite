@@ -1,7 +1,10 @@
 from django.urls import path
 from django.conf import settings
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from wkhtmltopdf.views import PDFTemplateResponse
+from .utils import create_mail
+from django.contrib import messages
+import threading
 
 class ReportMixin:
 
@@ -49,6 +52,8 @@ class EmailMixin:
 
     email_template = ''
     email_data = {}
+    subject = ''
+    to = None
 
     def get_urls(self):
         urls = super().get_urls()
@@ -56,11 +61,31 @@ class EmailMixin:
         custom_urls = [
             path(
                 '<int:model_id>/email/', 
-                 self.admin_site.admin_view(self.print_view), 
+                 self.admin_site.admin_view(self.email_view), 
                  name=f'{app_label}_{self.model._meta.model_name}_email'
                  ),
         ]
         return custom_urls + urls
     
+    def send_email_thread(self, email):
+        email.send(fail_silently=False)
+    
     def email_view(self, request, model_id):
-        pass
+        obj = get_object_or_404(self.model, pk=model_id)
+        self.email_data['obj']= obj
+        email = create_mail(
+            self.to,
+            self.subject,
+            self.email_template,
+            self.email_data
+        )
+
+        email_thread = threading.Thread(target=self.send_email_thread, args=(email,))
+        email_thread.start()
+
+        messages.success(request, 'El correo electrónico se está enviando en segundo plano. ¡Proceso completado!')
+
+        return redirect(request.META.get('HTTP_REFERER'))
+
+class ReportEmailMixin(ReportMixin, EmailMixin):
+    pass

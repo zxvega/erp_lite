@@ -135,8 +135,54 @@ IMPORT_EXPORT_IMPORT_PERMISSION_CODE = "import"
 IMPORT_EXPORT_EXPORT_PERMISSION_CODE = "export"
 
 
-# Configuration Mailtrap
+# Configuration Mailtrap Email Testing
 EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
 EMAIL_HOST_USER = 'b1a8a364000cd7'
 EMAIL_HOST_PASSWORD = '9eecd19dc29bfd'
 EMAIL_PORT = '2525'
+
+
+# Create a LOGGING dictionary
+LOGGING = {
+    # Use v1 of the logging config schema
+    'version': 1,
+    # Continue to use existing loggers
+    'disable_existing_loggers': False,
+    # Add a verbose formatter
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    # Create a log handler that prints logs to the terminal
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            # Add the verbose formatter
+            'formatter': 'verbose',
+        },
+        # Add a handler to write logs to a file
+        'file': {
+            # Use the FileHandler class
+            'class': 'logging.FileHandler',
+            # Specify a local log file as a raw string. Use your app's directory.
+            'filename': r'C:\Users\gvg1511\Documents\GitHub\erp_lite\django.log',
+        },
+    },
+    # Define the root logger's settings
+    'root': {
+        # Use the console and file logger
+        'handlers': ['console', 'file'],
+        'level': 'DEBUG',
+    },
+    # Define the django log module's settings
+    'loggers': {
+        'django': {
+            # Use the console and file logger
+            'handlers': ['console', 'file'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING'),
+            'propagate': False,
+        },
+    },
+}
