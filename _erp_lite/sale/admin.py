@@ -30,6 +30,8 @@ class SaleAdmin(ReportEmailMixin,admin.ModelAdmin):
             del actions['delete_selected']
         return actions
     
+    # Enlaces a las vistas
+
     def get_total(self, obj):
         sale = Sale.objects.get(pk=obj.id)
         return sum(detail.subtotal for detail in sale.details.all())
@@ -51,6 +53,8 @@ class SaleAdmin(ReportEmailMixin,admin.ModelAdmin):
         return mark_safe(link)
     
     send_email.short_description = 'Email'
+
+    # Vistas sobrescritas
 
     def print_view(self, request, model_id):
         sale = Sale.objects.get(pk=model_id)

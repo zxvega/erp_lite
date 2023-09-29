@@ -10,3 +10,17 @@ class CoreModel(models.Model):
 
     class Meta:
         abstract = True
+
+    
+class EmailLog(CoreModel):
+    to =  models.EmailField(max_length=254, null = True, blank = True)
+    subject = models.CharField(max_length=254, verbose_name='Destinatario')
+    content = models.TextField(verbose_name='Contenido')
+    response = models.TextField(verbose_name='Respuesta')
+
+    class Meta:
+        verbose_name = 'Registro de email'
+        verbose_name_plural = 'Registro de emails'
+    
+    def __str__(self):
+        return 'Email: #'  + str(self.id)

@@ -3,6 +3,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect
 from wkhtmltopdf.views import PDFTemplateResponse
 from .utils import create_mail
+from .models import EmailLog
 from django.contrib import messages
 import threading
 
@@ -78,12 +79,20 @@ class EmailMixin:
             self.subject,
             self.email_template,
             self.email_data
-        )
+        ) 
+        response = ''
+        try:
+            email_thread = threading.Thread(target=self.send_email_thread, args=(email,))
+            email_thread.start()
+        except Exception as e:
+            response = str(e)
+        else:
+            response = "Mensaje Enviado"
+        finally:
+            email_log = EmailLog(to = self.to,subject = self.subject,content= email.alternatives[0][0], response= response)
+            email_log.save()
 
-        email_thread = threading.Thread(target=self.send_email_thread, args=(email,))
-        email_thread.start()
-
-        messages.success(request, 'El correo electrónico se está enviando en segundo plano. ¡Proceso completado!')
+        messages.success(request, 'El correo electrónico se está enviando en segundo plano, puedes revisar el registro de emails')
 
         return redirect(request.META.get('HTTP_REFERER'))
 
