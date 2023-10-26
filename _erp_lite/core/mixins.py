@@ -6,6 +6,10 @@ from .utils import create_mail
 from .models import EmailLog
 from django.contrib import messages
 import threading
+from weasyprint import HTML, CSS
+from django_weasyprint import WeasyTemplateResponseMixin
+from django.template.loader import get_template
+from django.http import HttpResponse
 
 class ReportMixin:
 
@@ -96,5 +100,44 @@ class EmailMixin:
 
         return redirect(request.META.get('HTTP_REFERER'))
 
+
 class ReportEmailMixin(ReportMixin, EmailMixin):
     pass
+
+
+class WeasyPrintMixin:
+
+    print_template = ''
+    print_data = {}
+
+    def get_urls(self):
+        urls = super().get_urls()
+        app_label = self.model._meta.app_label
+        custom_urls = [
+            path(
+                '<int:model_id>/print/', 
+                 self.admin_site.admin_view(self.print_view), 
+                 name=f'{app_label}_{self.model._meta.model_name}_print'
+                 ),
+        ]
+        return custom_urls + urls
+    
+    def print_view(self, request, model_id):
+        obj = get_object_or_404(self.model, pk=model_id)
+        name = f'{self.model._meta.model_name}_print_{model_id}_pdf'
+        self.print_data['obj']= obj
+
+        # Renderizar el template con el contexto
+        context = self.print_data  # Puedes agregar más contexto si es necesario
+        html_template = get_template(self.print_template)
+        html_string = html_template.render(context)
+
+        # Crear un objeto WeasyPrint HTML desde la cadena HTML
+        html = HTML(string=html_string, base_url=request.build_absolute_uri())
+
+        # Generar el PDF
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{name}.pdf"'
+        html.write_pdf(response)
+
+        return response

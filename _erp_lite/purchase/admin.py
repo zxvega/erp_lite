@@ -13,14 +13,13 @@ class PurchaseDetailInline(admin.TabularInline):
     extra = 0
     min_num = 1
 
-class PurchaseAdmin(ReportEmailMixin,admin.ModelAdmin):
-    list_display = ('id', 'date','supplier','get_total','print','send_email')
+class PurchaseAdmin(WeasyPrintMixin,admin.ModelAdmin):
+    list_display = ('id', 'date','supplier','get_total','print')
     inlines = [PurchaseDetailInline]
     autocomplete_fields = ('supplier',)
     exclude = ['created_by','modified_by']
     list_filter = (('date',DateRangeFilterBuilder()),)
-    print_template = 'print/sale.html'
-    email_template = 'email/test.html'
+    print_template = 'print/purchase.html'
 
     def get_actions(self, request):
         actions = super().get_actions(request)
@@ -42,14 +41,15 @@ class PurchaseAdmin(ReportEmailMixin,admin.ModelAdmin):
         link = f'<a href="{url}" target="_blank"><b>Imprimir</b></a>'
         return mark_safe(link)
     
-    print.short_description = 'Nota de Venta'
+    print.short_description = 'Nota de Compra'
 
-    def send_email(self, obj):
-        url_name = f'admin:{obj._meta.app_label}_{obj._meta.model_name}_email'
-        url = reverse(url_name, args=[obj.id])
-        link = f'<a href="{url}"><b>Enviar a cliente</b></a>'
-        return mark_safe(link)
-    
-    send_email.short_description = 'Email'
+    # Vistas sobrescritas
+
+    def print_view(self, request, model_id):
+        sale = Purchase.objects.get(pk=model_id)
+        self.print_data['subtotal_sum'] = sum(detail.subtotal for detail in sale.details.all())
+        self.print_data['logo_url'] = '/static/purchase/tu_logo.png'
+        print(self.print_data['logo_url'])
+        return super().print_view(request, model_id)
 
 admin.site.register(Purchase, PurchaseAdmin)
