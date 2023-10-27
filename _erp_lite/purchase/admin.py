@@ -48,8 +48,6 @@ class PurchaseAdmin(WeasyPrintMixin,admin.ModelAdmin):
     def print_view(self, request, model_id):
         sale = Purchase.objects.get(pk=model_id)
         self.print_data['subtotal_sum'] = sum(detail.subtotal for detail in sale.details.all())
-        self.print_data['logo_url'] = '/static/purchase/tu_logo.png'
-        print(self.print_data['logo_url'])
         return super().print_view(request, model_id)
 
 admin.site.register(Purchase, PurchaseAdmin)

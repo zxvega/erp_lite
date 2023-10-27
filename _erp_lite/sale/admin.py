@@ -59,6 +59,7 @@ class SaleAdmin(ReportEmailMixin,admin.ModelAdmin):
     def print_view(self, request, model_id):
         sale = Sale.objects.get(pk=model_id)
         self.print_data['subtotal_sum'] = sum(detail.subtotal for detail in sale.details.all())
+        self.print_data['logo_url'] = r'C:\Users\gvg1511\Documents\GitHub\erp_lite\_erp_lite\sale\static\sale\tu_logo.png'
         return super().print_view(request, model_id)
     
     def email_view(self, request, model_id):

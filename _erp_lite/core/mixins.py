@@ -3,6 +3,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect
 from wkhtmltopdf.views import PDFTemplateResponse
 from .utils import create_mail
+from django.views.generic import DetailView
 from .models import EmailLog
 from django.contrib import messages
 import threading
@@ -44,7 +45,8 @@ class ReportMixin:
                 "zoom":1, 
                 "viewport-size" :"1366 x 513", 
                 'javascript-delay':1000, 
-                'footer-right' :'[page]/[topage]', 
+                'footer-right' :'[page]/[topage]',
+                'enable-local-file-access':True, 
                 'footer-font-size' : 8 ,
                 "no-stop-slow-scripts":True,
                 
@@ -133,6 +135,7 @@ class WeasyPrintMixin:
         html_string = html_template.render(context)
 
         # Crear un objeto WeasyPrint HTML desde la cadena HTML
+        print(request.build_absolute_uri())
         html = HTML(string=html_string, base_url=request.build_absolute_uri())
 
         # Generar el PDF
