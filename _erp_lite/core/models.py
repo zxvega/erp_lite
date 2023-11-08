@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.conf import settings
 from django.db import models
 
@@ -7,6 +8,9 @@ class CoreModel(models.Model):
     id = models.AutoField(primary_key=True)
     created = models.DateTimeField(auto_now_add=True, verbose_name='Fecha creacion')
     modified = models.DateTimeField(auto_now=True, verbose_name='Fecha modificacion')
+    created_by = models.ForeignKey(User, null=True, blank=True, related_name = 'created_%(class)s', on_delete=models.PROTECT, verbose_name='Creado por')
+    modified_by = models.ForeignKey(User, null=True, blank=True, related_name = 'modified_%(class)s', on_delete=models.PROTECT, verbose_name='Modificado por')
+
 
     class Meta:
         abstract = True

@@ -12,8 +12,6 @@ class Contact(CoreModel):
     addres = models.CharField(max_length=254, blank=True, null=True, verbose_name='Dirección')
     telephone = PhoneNumberField(unique = False, null = False, blank = False, verbose_name='Telefono') 
     email = models.EmailField(max_length=254, null = True, blank = True)
-    created_by = models.ForeignKey(User, null=True, blank=True, related_name = 'created_contacts', on_delete=models.PROTECT, verbose_name='Creado por')
-    modified_by = models.ForeignKey(User, null=True, blank=True, related_name = 'modified_contacts', on_delete=models.PROTECT, verbose_name='Modificado por')
 
     def __str__(self):
         return self.name + ' ' + self.last_name

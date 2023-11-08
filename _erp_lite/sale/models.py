@@ -11,8 +11,6 @@ class Sale(CoreModel):
     date = models.DateField(verbose_name='Fecha')
     customer = models.ForeignKey(Contact, null=True, blank=True, related_name = 'customer_sales', on_delete=models.PROTECT,verbose_name='Cliente') 
     description = models.CharField(max_length=255, null=True, blank=True)
-    created_by = models.ForeignKey(User, null=True, blank=True, related_name = 'created_sales', on_delete=models.PROTECT, verbose_name='Creado por')
-    modified_by = models.ForeignKey(User, null=True, blank=True, related_name = 'modified_sales', on_delete=models.PROTECT, verbose_name='Modificado por')
 
     def __str__(self):
         return 'Venta: ' + str(self.id)

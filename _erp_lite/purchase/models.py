@@ -10,8 +10,6 @@ class Purchase(CoreModel):
     date = models.DateField(verbose_name='Fecha')
     supplier = models.ForeignKey(Contact, null=True, blank=True, related_name = 'supplier_purchase', on_delete=models.PROTECT,verbose_name='Proveedor') 
     description = models.CharField(max_length=255, null=True, blank=True)
-    created_by = models.ForeignKey(User, null=True, blank=True, related_name = 'created_purchases', on_delete=models.PROTECT, verbose_name='Creado por')
-    modified_by = models.ForeignKey(User, null=True, blank=True, related_name = 'modified_purchases', on_delete=models.PROTECT, verbose_name='Modificado por')
 
     def __str__(self):
         return 'Compra: ' + str(self.id)
