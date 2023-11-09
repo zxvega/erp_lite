@@ -23,6 +23,7 @@ class SaleAdmin(ReportEmailMixin,admin.ModelAdmin):
     list_filter = (('date',DateRangeFilterBuilder()),)
     print_template = 'print/sale.html'
     email_template = 'email/test.html'
+    change_form_template = 'admin/custom_change_form.html'
 
     def get_actions(self, request):
         actions = super().get_actions(request)
